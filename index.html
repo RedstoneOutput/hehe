@@ -1,31 +1,80 @@
-<div id="attacker-ui" style="background: #222; color: #0f0; padding: 20px; font-family: monospace;">
-    <h2>Remote Access Controller (Simulation)</h2>
-    <div id="screen-viewer" style="width: 400px; height: 300px; background: #000; border: 2px solid #555; position: relative;">
-        <p style="text-align: center; margin-top: 130px;">[ LIVE STREAM OF VICTIM DESKTOP ]</p>
-        <div id="fake-cursor" style="width: 10px; height: 10px; background: red; position: absolute; top: 50px; left: 50px; border-radius: 50%;"></div>
-    </div>
-    
-    <div id="controls" style="margin-top: 20px;">
-        <button onclick="sendCommand('OPEN_BROWSER')">Open Victim's Browser</button>
-        <button onclick="sendCommand('STEAL_COOKIES')">Extract Session Tokens</button>
-        <button onclick="sendCommand('LOCK_SCREEN')">Lock Victim Out</button>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remote Access Simulation</title>
+    <style>
+        body { background: #1a1a1a; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; }
+        #panel { border: 2px solid #333; padding: 20px; background: #000; box-shadow: 0 0 20px rgba(0,255,65,0.2); }
+        #screen-frame { width: 640px; height: 360px; background: #222; border: 1px solid #444; position: relative; overflow: hidden; }
+        .victim-desktop { width: 100%; height: 100%; opacity: 0.7; filter: grayscale(50%); }
+        #log { width: 640px; height: 150px; background: #050505; border: 1px solid #444; margin-top: 10px; overflow-y: scroll; font-size: 12px; padding: 10px; }
+        .btn-group { margin-top: 15px; }
+        button { background: #00ff41; color: #000; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        button:hover { background: #00cc33; }
+        .status { color: #ffcc00; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
 
-<script>
-// This is the "Socket" logic that would connect to the victim
-function sendCommand(action) {
-    console.log("Sending interactive command to victim's device: " + action);
-    // In a real attack, this would send a JSON packet like:
-    // { "type": "input", "action": "click", "x": 450, "y": 200 }
-    alert("Simulation: " + action + " sent to the 'infected' device.");
-}
+    <h1>C2 CONTROL INTERFACE [BETA]</h1>
+    <div class="status">● CONNECTION ACTIVE: 192.168.1.45 (Kyle-PC)</div>
 
-// Tracking the attacker's mouse to mirror it on the victim's screen
-document.getElementById('screen-viewer').addEventListener('mousemove', function(e) {
-    let cursor = document.getElementById('fake-cursor');
-    cursor.style.left = e.offsetX + 'px';
-    cursor.style.top = e.offsetY + 'px';
-    // Real RATs send these coordinates to the victim's OS 60 times per second
-});
-</script>
+    <div id="panel">
+        <div id="screen-frame">
+            <img src="https://via.placeholder.com/640x360/111/00ff41?text=LIVE+DESKTOP+STREAM" class="victim-desktop" id="live-stream">
+            <div id="remote-cursor" style="position:absolute; width:12px; height:12px; background:red; border-radius:50%; top:50%; left:50%; pointer-events:none;"></div>
+        </div>
+
+        <div class="btn-group">
+            <button onclick="triggerAction('SCREENSHOT')">Capture Screen</button>
+            <button onclick="triggerAction('KEYLOG')">Start Keylogger</button>
+            <button onclick="triggerAction('WEBCAM')">Access Camera</button>
+            <button style="background:red; color:white;" onclick="triggerAction('TERMINATE')">Self-Destruct Agent</button>
+        </div>
+    </div>
+
+    <div id="log">
+        [SYSTEM] Interface Initialized...<br>
+        [SYSTEM] Waiting for Beacon from Agent...<br>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+        const screen = document.getElementById('screen-frame');
+        const cursor = document.getElementById('remote-cursor');
+
+        // Simulate the mouse tracking that happens in a RAT
+        screen.addEventListener('mousemove', (e) => {
+            const rect = screen.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            cursor.style.left = x + 'px';
+            cursor.style.top = y + 'px';
+            
+            // Real hackers send these X/Y coordinates to the agent
+            // socket.send(JSON.stringify({type: 'mouse_move', x: x, y: y}));
+        });
+
+        function triggerAction(type) {
+            const time = new Date().toLocaleTimeString();
+            let msg = "";
+
+            if(type === 'SCREENSHOT') msg = "Requesting high-res frame from Agent...";
+            if(type === 'KEYLOG') msg = "Hooking keyboard drivers... intercepting 'facebook.com' login.";
+            if(type === 'WEBCAM') msg = "Initializing hardware ID: 0x442... Light suppressed.";
+            if(type === 'TERMINATE') msg = "ERASING AGENT FROM DISK. Connection Lost.";
+
+            log.innerHTML += `[${time}] ${msg}<br>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Simulate "Beacons" arriving every 3 seconds
+        setInterval(() => {
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML += `<span style="color:#555">[${time}] Beacon received from 192.168.1.45</span><br>`;
+            log.scrollTop = log.scrollHeight;
+        }, 3000);
+    </script>
+</body>
+</html>
