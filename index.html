@@ -9,6 +9,10 @@
         .log-window { background: #050505; border: 1px solid #333; height: 300px; overflow-y: scroll; padding: 10px; font-size: 13px; }
         .status-on { color: #00ff41; font-weight: bold; }
         .cmd-hint { color: #888; margin-top: 10px; }
+        /* New styles for the navigation button */
+        .nav-section { margin-bottom: 15px; padding: 10px; border: 1px dashed #444; }
+        .launch-btn { background: #00ff41; color: #000; border: none; padding: 10px 15px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+        .launch-btn:hover { background: #00cc33; }
     </style>
 </head>
 <body>
@@ -16,6 +20,11 @@
         <div class="header">
             <h2>EXTERNAL ASSET MONITOR [v1.0]</h2>
             <p>LISTENING ON: <span class="status-on">0.0.0.0:4444</span></p>
+        </div>
+
+        <div class="nav-section">
+            <p style="margin-top: 0;">ASSET DEPLOYMENT:</p>
+            <a href="prey_site.html" target="_blank" class="launch-btn">OPEN PREY SITE</a>
         </div>
 
         <div class="log-window" id="console">
