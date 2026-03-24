@@ -1,20 +1,31 @@
-<div style="display:none;">
-    <iframe src="https://example-malicious-site.com/check_vulnerabilities"></iframe>
+<div id="attacker-ui" style="background: #222; color: #0f0; padding: 20px; font-family: monospace;">
+    <h2>Remote Access Controller (Simulation)</h2>
+    <div id="screen-viewer" style="width: 400px; height: 300px; background: #000; border: 2px solid #555; position: relative;">
+        <p style="text-align: center; margin-top: 130px;">[ LIVE STREAM OF VICTIM DESKTOP ]</p>
+        <div id="fake-cursor" style="width: 10px; height: 10px; background: red; position: absolute; top: 50px; left: 50px; border-radius: 50%;"></div>
+    </div>
+    
+    <div id="controls" style="margin-top: 20px;">
+        <button onclick="sendCommand('OPEN_BROWSER')">Open Victim's Browser</button>
+        <button onclick="sendCommand('STEAL_COOKIES')">Extract Session Tokens</button>
+        <button onclick="sendCommand('LOCK_SCREEN')">Lock Victim Out</button>
+    </div>
 </div>
 
 <script>
-    // This script might try to trigger a download automatically
-    // Browsers in 2026 block most of these, but scammers use
-    // 'blob' URLs to bypass simple filters.
-    function simulateSilentDownload() {
-        const fakePayload = "This is a simulated malicious file.";
-        const blob = new Blob([fakePayload], {type: 'application/octet-stream'});
-        const url = window.URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Update_Required.exe'; // A common trick name
-        // a.click(); // This would normally trigger the download prompt
-        console.log("Attack Simulation: Silent download attempted.");
-    }
+// This is the "Socket" logic that would connect to the victim
+function sendCommand(action) {
+    console.log("Sending interactive command to victim's device: " + action);
+    // In a real attack, this would send a JSON packet like:
+    // { "type": "input", "action": "click", "x": 450, "y": 200 }
+    alert("Simulation: " + action + " sent to the 'infected' device.");
+}
+
+// Tracking the attacker's mouse to mirror it on the victim's screen
+document.getElementById('screen-viewer').addEventListener('mousemove', function(e) {
+    let cursor = document.getElementById('fake-cursor');
+    cursor.style.left = e.offsetX + 'px';
+    cursor.style.top = e.offsetY + 'px';
+    // Real RATs send these coordinates to the victim's OS 60 times per second
+});
 </script>
